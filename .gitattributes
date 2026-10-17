@@ -1,0 +1,23 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Shell scripts run on Linux (the server, the Docker build, CI) -- CRLF would break the shebang.
+*.sh text eol=lf
+*.yml text eol=lf
+Dockerfile text eol=lf
+# ... and the Windows launcher wants CRLF.
+*.cmd text eol=crlf
+
+# Godot source and data: text, but never "fixed up" by a merge tool.
+*.gd text eol=lf
+*.tscn text eol=lf
+*.godot text eol=lf
+
+# Binary, whatever git guesses.
+*.png binary
+*.wav binary
+*.ogg binary
+*.zip binary
+*.exe binary
+*.pck binary
+*.wasm binary

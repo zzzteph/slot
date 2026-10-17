@@ -1,0 +1,16 @@
+# Exports, screenshots and tool output.
+/build/
+
+# Godot's own caches (rebuilt by `godot --headless --import`).
+/.godot/
+*.translation
+
+# Editors and operating systems.
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+override.cfg
