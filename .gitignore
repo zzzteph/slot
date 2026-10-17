@@ -1,16 +1,33 @@
-# Exports, screenshots and tool output.
-/build/
+# The repository carries SOURCE: scripts, scenes, art, tests and tools. Everything a build produces is
+# made again from that in a minute -- by the workflow on every push (.github/workflows/build.yml) -- so
+# none of it belongs in git.
 
-# Godot's own caches (rebuilt by `godot --headless --import`).
+# Exports, screenshots, verification logs and tool output.
+/build/
+*.tmp
+*.log
+
+# Godot's own caches: the import cache, the shader cache, editor state (rebuilt by `godot --import`).
 /.godot/
 *.translation
+
+# Intermediate art: the icon tool's raw render (tools/render_art.gd -> tools/make_icons.py). Only the
+# icons made from it are used.
+/art/icon_render.png
+/art/icon_render.png.import
+
+# Local-only overrides and secrets.
+override.cfg
+export_credentials.cfg
+*.pem
+*.keystore
 
 # Editors and operating systems.
 .DS_Store
 Thumbs.db
+desktop.ini
 *.swp
 *~
 .vscode/
 .idea/
-
-override.cfg
+__pycache__/

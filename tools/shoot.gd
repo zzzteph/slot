@@ -68,6 +68,7 @@ func _race_shot(track: String, name_: String, secs: float, crash: bool, zoom: in
 			if crash:
 				race.autopilot = null
 				race.pointer_held = true
+				race.pointer_demand = 1.0
 			race.step(DT)
 			race._process(DT)
 			t += DT

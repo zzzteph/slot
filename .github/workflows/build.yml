@@ -1,0 +1,134 @@
+name: build
+
+# EVERY PUSH TO main SHIPS. In one run:
+#   1. a version is stamped:  <major>.<minor> from project.godot's config/version, and the build number
+#      (this workflow's run number) as the patch -- v0.1.17, v0.1.18, ... -- into the game itself (the
+#      menu shows it) and into the Windows exe's file properties;
+#   2. the tests run, and a failing test stops everything: no release, no deploy;
+#   3. Windows and Web are exported;
+#   4. a GitHub Release v<version> is published with the Windows build zipped;
+#   5. the Web build goes to GitHub Pages.
+#
+# To start a new major/minor line, change config/version in project.godot (e.g. "0.2.0"); the patch is
+# always the run number. One-time setup on GitHub: Settings > Pages > Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.2
+
+permissions:
+  contents: write     # the release
+  pages: write        # the deploy
+  id-token: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Where Godot lives
+        run: echo "GODOT_BIN=$HOME/godot-bin/godot" >> "$GITHUB_ENV"
+
+      - name: Stamp the version
+        id: v
+        run: |
+          set -eu
+          base=$(sed -n 's/^config\/version="\(.*\)"$/\1/p' project.godot)
+          major=$(echo "$base" | cut -d. -f1)
+          minor=$(echo "$base" | cut -d. -f2)
+          version="${major}.${minor}.${GITHUB_RUN_NUMBER}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          sed -i "s/^config\/version=\".*\"$/config\/version=\"$version\"/" project.godot
+          sed -i "s/^application\/file_version=\".*\"$/application\/file_version=\"$version.0\"/" export_presets.cfg
+          sed -i "s/^application\/product_version=\".*\"$/application\/product_version=\"$version.0\"/" export_presets.cfg
+          grep -n "config/version" project.godot
+          grep -n "_version=" export_presets.cfg
+          echo "SLOT v$version" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Cache Godot and its export templates
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot-bin
+            ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+          key: godot-${{ env.GODOT_VERSION }}-win-web
+
+      - name: Fetch Godot and the Windows + Web templates
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          set -eux
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          curl -fsSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p "$(dirname "$GODOT_BIN")"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" "$GODOT_BIN"
+          chmod +x "$GODOT_BIN"
+          dest="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$dest"
+          # Only what this game exports: ~100 MB to cache instead of ~1 GB.
+          unzip -q templates.tpz "templates/version.txt" "templates/windows_*_x86_64*" "templates/web_nothreads_*"
+          mv templates/* "$dest/"
+          rm -f godot.zip templates.tpz
+          ls -la "$dest"
+
+      - name: Import the project
+        run: |
+          "$GODOT_BIN" --headless --path . --import || true
+          "$GODOT_BIN" --headless --path . --import
+
+      - name: Test (a failure stops the release and the deploy)
+        run: GODOT="$GODOT_BIN" sh tools/verify.sh
+
+      - name: Export Windows and Web
+        run: |
+          set -eux
+          mkdir -p build/windows build/web build/release
+          "$GODOT_BIN" --headless --path . --export-release "Windows Desktop" build/windows/SLOT.exe
+          "$GODOT_BIN" --headless --path . --export-release "Web" build/web/index.html
+          test -s build/windows/SLOT.exe
+          test -s build/web/index.html
+          (cd build/windows && zip -9 "../release/SLOT-v${{ steps.v.outputs.version }}-windows.zip" SLOT.exe)
+          ls -lh build/release build/web
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.v.outputs.version }}
+          name: SLOT v${{ steps.v.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          body: |
+            **Windows:** download `SLOT-v${{ steps.v.outputs.version }}-windows.zip`, unzip, run `SLOT.exe`.
+            **Play in the browser:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+            Built from ${{ github.sha }}.
+          fail_on_unmatched_files: true
+          files: build/release/SLOT-v${{ steps.v.outputs.version }}-windows.zip
+
+      - name: Hand the web build to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

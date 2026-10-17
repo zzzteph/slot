@@ -143,12 +143,8 @@ func update_from(race: Race, delta: float) -> void:
 	cable.power = controller.power
 	cable.simulate(delta, controller.cable_exit())
 	hint_label.position = controller.position + Vector2(0, -28)
-	if race.pointer_held:
-		hint_label.text = "<  LESS        MORE  >"
-		hint_label.visible = true
-	else:
-		hint_label.text = _hint_idle
-		hint_label.visible = race.phase == "countdown" or race.race_time < HINT_TIME
+	hint_label.text = _hint_idle
+	hint_label.visible = not race.pointer_held and (race.phase == "countdown" or race.race_time < HINT_TIME)
 	var lap := clampi(p.laps_done() + 1, 1, race.laps)
 	lap_label.text = "LAP %d/%d" % [lap, race.laps] if not p.finished else "FINISHED"
 	mini_map.queue_redraw()
