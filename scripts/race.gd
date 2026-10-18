@@ -414,8 +414,9 @@ func _effects(_dt: float) -> void:
 			continue
 		if c.throttle > 0.55 and randf() < c.throttle * 0.5:
 			fx.spark(c.guide_position(), c.heading)
-		if c.danger() > 0.75 and randf() < 0.4:
-			fx.smoke(c.position - Vector2.from_angle(c.heading) * 14.0 * SlotCar.CAR_SCALE)
+		# The tail is out and the pickups are losing the braids: they arc.
+		if c.danger() > 0.75 and randf() < 0.5:
+			fx.arc(c.guide_position(), 16.0 + 18.0 * c.danger())
 
 
 func _audio() -> void:

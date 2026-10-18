@@ -7,7 +7,7 @@ const CARDS := [
 	["res://art/help/tail.png", "2  WATCH THE TAIL",
 		"You never steer: the car follows its slot. Near a bend's limit the tail swings out -- that is your warning. Ease off BEFORE the bend, power on as it opens."],
 	["res://art/help/off.png", "3  DON'T COME OFF",
-		"Too fast and the car slides, smokes and flies off the track. The marshal puts it back where it left -- two seconds you never get back."],
+		"Too fast and the car slides, its pickups crackling with sparks, and it flies off the track. The marshal puts it back where it left -- two seconds you never get back."],
 	["res://art/help/lanes.png", "4  PICK YOUR LANE",
 		"Four lanes, one car each. Inside: shorter, but tighter bends. Outside: longer, but faster through the bends. On the Figure 8 they all cross."],
 ]

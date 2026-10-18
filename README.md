@@ -30,7 +30,7 @@ Every bend has a speed it can be taken at, and the only one who decides whether 
   **Space**.)
 * **Watch the tail.** Near a bend's limit the car's tail swings out. That's your only warning.
   There are no meters.
-* **Don't come off.** Too fast and the car slides, smokes, and flies off the track. The marshal puts
+* **Don't come off.** Too fast and the car slides, its pickups crackling with sparks, and flies off the track. The marshal puts
   it back where it left, and those two seconds never come back.
 
 ## Screenshots

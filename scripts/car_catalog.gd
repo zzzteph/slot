@@ -13,7 +13,7 @@ extends RefCounted
 const DEFAULT_ID := "sport"
 
 const STATS := {
-	"top_speed": 900.0, "accel": 640.0, "brake": 1400.0, "grip": 1150.0, "forgiveness": 1.0,
+	"top_speed": 900.0, "accel": 1200.0, "brake": 1400.0, "grip": 1300.0, "forgiveness": 1.5,
 }
 
 const CARS := [

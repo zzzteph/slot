@@ -19,6 +19,7 @@ on:
 
 env:
   GODOT_VERSION: 4.7.2
+  GAME_NAME: SLOT          # the release's name and the download's file name
 
 permissions:
   contents: write     # the release
@@ -54,7 +55,7 @@ jobs:
           sed -i "s/^application\/product_version=\".*\"$/application\/product_version=\"$version.0\"/" export_presets.cfg
           grep -n "config/version" project.godot
           grep -n "_version=" export_presets.cfg
-          echo "SLOT v$version" >> "$GITHUB_STEP_SUMMARY"
+          echo "$GAME_NAME v$version" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Cache Godot and its export templates
         id: cache
@@ -96,27 +97,27 @@ jobs:
         run: |
           set -eux
           mkdir -p build/windows build/web build/release
-          "$GODOT_BIN" --headless --path . --export-release "Windows Desktop" build/windows/SLOT.exe
+          "$GODOT_BIN" --headless --path . --export-release "Windows Desktop" "build/windows/${GAME_NAME}.exe"
           "$GODOT_BIN" --headless --path . --export-release "Web" build/web/index.html
-          test -s build/windows/SLOT.exe
+          test -s "build/windows/${GAME_NAME}.exe"
           test -s build/web/index.html
-          (cd build/windows && zip -9 "../release/SLOT-v${{ steps.v.outputs.version }}-windows.zip" SLOT.exe)
+          (cd build/windows && zip -9 "../release/${GAME_NAME}-v${{ steps.v.outputs.version }}-windows.zip" "${GAME_NAME}.exe")
           ls -lh build/release build/web
 
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.v.outputs.version }}
-          name: SLOT v${{ steps.v.outputs.version }}
+          name: ${{ env.GAME_NAME }} v${{ steps.v.outputs.version }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           body: |
-            **Windows:** download `SLOT-v${{ steps.v.outputs.version }}-windows.zip`, unzip, run `SLOT.exe`.
+            **Windows:** download `${{ env.GAME_NAME }}-v${{ steps.v.outputs.version }}-windows.zip`, unzip, run `${{ env.GAME_NAME }}.exe`.
             **Play in the browser:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
 
             Built from ${{ github.sha }}.
           fail_on_unmatched_files: true
-          files: build/release/SLOT-v${{ steps.v.outputs.version }}-windows.zip
+          files: build/release/${{ env.GAME_NAME }}-v${{ steps.v.outputs.version }}-windows.zip
 
       - name: Hand the web build to Pages
         uses: actions/upload-pages-artifact@v3

@@ -4,7 +4,7 @@ extends CanvasLayer
 ## CONTROLLER in your hand (its plunger travels in as you squeeze -- a feel for the pressure, not a
 ## number to line it up with), and the lap; top right, the map and the race order; top left,
 ## pause; and the cards in the middle (countdown, "off the slot", the finish and the pause). How close the
-## car is to coming off is on the track, not on a meter: the tail swings out, smokes, and squeals.
+## car is to coming off is on the track, not on a meter: the tail swings out, the pickups arc, and it squeals.
 ##
 ## Rope Racers' type scale (`UiTheme`); built in code, fed once a frame by `update_from`.
 

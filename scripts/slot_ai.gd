@@ -18,7 +18,7 @@ const TOP_SHARE := {"easy": 0.86, "medium": 0.95, "hard": 1.0}
 ## Greedy moments per second, and how long one lasts.
 const GREED_RATE := {"easy": 0.04, "medium": 0.06, "hard": 0.05}
 const GREED_TIME := 2.0
-const GREED := 1.13
+const GREED := 1.18
 ## How far ahead it looks, in seconds at its current speed: the throttle takes time to close.
 const LOOKAHEAD := 0.2
 ## The motor brake a released trigger really delivers, once the throttle has closed, as a share of the

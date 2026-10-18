@@ -28,7 +28,8 @@ func _ready() -> void:
 	slots.name = "Slots"
 	add_child(slots)
 
-	var title := UiTheme.label("Title", "SLOT", 96, TITLE_COLOR)
+	# The game's name lives in one place, project.godot (application/config/name).
+	var title := UiTheme.label("Title", String(ProjectSettings.get_setting("application/config/name", "SLOT")), 96, TITLE_COLOR)
 	title.add_theme_color_override("font_outline_color", Color.BLACK)
 	title.add_theme_constant_override("outline_size", 10)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

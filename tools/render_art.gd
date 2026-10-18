@@ -7,7 +7,7 @@ extends SceneTree
 ## controllers wired to their power base at the start line.
 ##
 ## Writes (into res://art/):
-##   splash.png       1920x1080, with the title -- the boot splash
+##   splash.png       1920x1080, no lettering  -- the boot splash
 ##   menu_bg.png      1920x1080, no title      -- the title screen (and help / settings)
 ##   bg_garage.png    the start line and its gantry, low and calm  -- car select
 ##   bg_tracks.png    the whole layout from high above            -- track select
@@ -39,7 +39,6 @@ var _world: Node3D
 var _parent: Node3D
 var _table: Node3D
 var _camera: Camera3D
-var _title: Control
 var _path := PackedVector2Array()
 var _nrm := PackedVector2Array()
 var _mats := {}
@@ -75,11 +74,9 @@ func _init() -> void:
 		_build_room()
 		_build_layout()
 		_race_cars()
-		_build_title()
 		_key_camera()
-		_title.visible = true
+		# No lettering in any picture: the splash is the same scene as the title screen's background.
 		await _save("res://art/splash.png")
-		_title.visible = false
 		await _save("res://art/menu_bg.png")
 
 		# Car select: by the controllers and the start line, the grid empty but for one car waiting.
@@ -286,20 +283,10 @@ func _start_line() -> void:
 	var across := b - a
 	var beam := _box(Vector3(across.length() + 6, 24, 6), (a + b) * 0.5 + Vector3(0, 110, 0), post)
 	beam.rotation.y = atan2(-across.z, across.x)
-	# The sign on the beam's face towards -Z (where the cameras are), reading the right way round.
+	# The side of the line the cameras look at (-Z): the lap counter's digits face it.
 	var face := across.cross(Vector3.UP).normalized()
 	if face.z > 0.0:
 		face = -face
-	var sign := Label3D.new()
-	sign.text = "S L O T"
-	sign.font_size = 150
-	sign.pixel_size = 0.12
-	sign.modulate = Color(1.0, 0.9, 0.3)
-	sign.outline_size = 0
-	sign.double_sided = false
-	_parent.add_child(sign)
-	sign.position = beam.position + face * 3.4
-	sign.rotation.y = atan2(face.x, face.z)
 	# The lap counter tower beside the line, its digits lit.
 	var tower := _box(Vector3(40, 90, 26), _p3(i, HALF + 80, 45), post)
 	var digits := Label3D.new()
@@ -372,7 +359,7 @@ func _race_cars() -> void:
 	holder.rotate_object_local(Vector3.UP, 0.9)
 	holder.rotate_object_local(Vector3(1, 0, 0), 1.1)
 	_sparks(_p3(i, LANES[3] + 20.0, TRACK_H + 2), 14)
-	_car("kart", Color(0.35, 0.78, 0.22), _index_at(0.36), LANES[3], 0.06, true)
+	# Four lanes, four cars: the Rally WAS the fourth lane's car -- nobody else is in it.
 
 
 ## One car: the game's model, at path index `i`, `off` across the road, its tail swung out by `tail`
@@ -461,36 +448,6 @@ func _icon_piece() -> void:
 
 
 # ---------------------------------------------------------------- overlays
-
-func _build_title() -> void:
-	_title = Control.new()
-	_title.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_vp.add_child(_title)
-	var grad := Gradient.new()
-	grad.set_color(0, Color(0.02, 0.02, 0.04, 0.7))
-	grad.set_color(1, Color(0.02, 0.02, 0.04, 0.0))
-	var tex := GradientTexture2D.new()
-	tex.gradient = grad
-	tex.fill_from = Vector2(0.5, 0.0)
-	tex.fill_to = Vector2(0.5, 1.0)
-	tex.width = 16
-	tex.height = 256
-	var shade := TextureRect.new()
-	shade.texture = tex
-	shade.stretch_mode = TextureRect.STRETCH_SCALE
-	shade.size = Vector2(W, 320)
-	_title.add_child(shade)
-	var l := Label.new()
-	l.text = "SLOT"
-	l.position = Vector2(0, 60)
-	l.size = Vector2(W, 200)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.add_theme_font_size_override("font_size", 190)
-	l.add_theme_color_override("font_color", Color(1.0, 0.9, 0.28))
-	l.add_theme_color_override("font_outline_color", Color(0.05, 0.05, 0.08))
-	l.add_theme_constant_override("outline_size", 26)
-	_title.add_child(l)
-
 
 func _build_vignette() -> void:
 	var grad := Gradient.new()

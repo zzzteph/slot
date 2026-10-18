@@ -29,6 +29,8 @@ const ANALOG_FALL := 6.0
 ## Above full-throttle speed... below it, a partly open throttle coasts down at this much plus the
 ## brake's share of what is closed.
 const COAST_DECEL := 160.0
+## The share of the motor's pull at the lightest touch of throttle; full throttle is all of it.
+const ACCEL_FLOOR := 0.3
 ## The tail swings out from half the limit, to TAIL_MAX at the limit.
 const TAIL_FROM := 0.5
 const TAIL_MAX := 0.32
@@ -232,7 +234,10 @@ func _step_slotted(dt: float) -> void:
 	else:
 		var target := throttle * top_speed
 		if speed < target:
-			speed = minf(target, speed + accel * (1.0 - 0.55 * speed / top_speed) * dt)
+			# The harder the trigger is squeezed, the harder the motor pulls: a whisper of throttle
+			# creeps, a full squeeze is all of `accel`. (It fades as the car nears its top speed.)
+			var pull := accel * (ACCEL_FLOOR + (1.0 - ACCEL_FLOOR) * throttle)
+			speed = minf(target, speed + pull * (1.0 - 0.55 * speed / top_speed) * dt)
 		else:
 			speed = maxf(target, speed - (COAST_DECEL + brake * (1.0 - throttle)) * dt)
 	var k := lane.curvature_at(s)
