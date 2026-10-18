@@ -57,7 +57,7 @@ func _trigger() -> void:
 	root.add_child(cable)
 	var ctl: Control = hud_script.HandController.new()
 	ctl.position = Vector2(470, 210)
-	ctl.size = Vector2(312, 392)
+	ctl.size = Vector2(156, 196) * float(hud_script.HandController.SCALE)
 	ctl.squeeze = 0.6
 	ctl.power = 0.7
 	ctl.hover = true

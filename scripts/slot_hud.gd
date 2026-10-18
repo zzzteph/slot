@@ -21,7 +21,7 @@ const PANEL_Y := 636.0
 const PANEL_H := 72.0
 ## The controller is drawn at `HandController.SCALE`, mirrored: trigger on the LEFT, squeezed towards
 ## the RIGHT -- the same way the mouse drags for more power.
-const CONTROLLER_RECT := Rect2(8, 326, 312, 392)
+const CONTROLLER_RECT := Rect2(8, 365, 281, 353)        # 156 x 196 drawn at HandController.SCALE
 ## Top right, one column: the lap, the map, the race order.
 const LAP_RECT := Rect2(1064, 8, 208, 72)
 const MAP_RECT := Rect2(1064, 88, 208, 128)
@@ -372,7 +372,7 @@ class MiniMap extends Control:
 ## on purpose there is no scale on it, no number and no mark for "the right amount".
 class HandController extends Control:
 	const TRAVEL := 32.0                  # px the trigger moves from rest to fully in
-	const SCALE := 2.0
+	const SCALE := 1.8
 	const BODY := Color(0.17, 0.17, 0.19)
 	const BODY_EDGE := Color(0.30, 0.30, 0.33)
 	const BODY_SHINE := Color(1, 1, 1, 0.10)
